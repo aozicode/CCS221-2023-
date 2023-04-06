@@ -8,10 +8,13 @@ def read_image(file):
     img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-def reflect_image(img):
+def reflect_image(img, reflection_type):
     rows, cols, ch = img.shape
-    m_reflection=np.float32([[1, 0, 0], [0,-1,rows],[0,0,1]])
-    reflected_img=cv2.warpPerspective(img,m_reflection,(int(cols),int(rows)))
+    if reflection_type == 'Vertical':
+        m_reflection = np.float32([[1, 0, 0], [0, -1, rows], [0, 0, 1]])
+    else:
+        m_reflection = np.float32([[-1, 0, cols], [0, 1, 0], [0, 0, 1]])
+    reflected_img = cv2.warpPerspective(img, m_reflection, (int(cols), int(rows)))
     plt.axis('off')
     plt.imshow(reflected_img)
     return plt.gcf()
@@ -50,22 +53,25 @@ if uploaded_file is not None:
     img = read_image(uploaded_file)
 
     # Reflect the image
-    st.subheader("Reflected Image")
-    fig_reflect = reflect_image(img)
+    st.subheader("Reflect Image")
+    reflection_type = st.radio("Reflection type", options=['Vertical', 'Horizontal'])
+    fig_reflect = reflect_image(img, reflection_type)
     st.pyplot(fig_reflect)
 
     # Rotate the image
-    st.subheader("Rotated Image")
-    fig_rotate = rotate_image(img, 10)
+    st.subheader("Rotate Image")
+    angle = st.slider("Angle (in degrees)", -180, 180, 0)
+    fig_rotate = rotate_image(img, angle)
     st.pyplot(fig_rotate)
 
     # Shear the image
-    st.subheader("Sheared Image")
-    fig_shear = shear_image(img, 0.5)
+    st.subheader("Shear Image")
+    shear_factor = st.slider("Shear factor", -1.0, 1.0, 0.0, 0.1)
+    fig_shear = shear_image(img, shear_factor)
     st.pyplot(fig_shear)
 
     # Translate the image
-    st.subheader("Translated Image")
+    st.subheader("Translate Image")
     x_offset = st.slider("X Offset", -img.shape[1], img.shape[1], 0)
     y_offset = st.slider("Y Offset", -img.shape[0], img.shape[0], 0)
     fig_translate = translate_image(img, x_offset, y_offset)
