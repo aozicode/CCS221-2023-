@@ -44,7 +44,6 @@ def translate_image(img, x_offset, y_offset):
     plt.axis('off')
     return plt.gcf()
 
-# Streamlit code
 st.title("Image Manipulation")
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
